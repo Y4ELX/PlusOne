@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react';
 import oneplusImg from './assets/img/oneplus.png';
+import Register from './Register.jsx';
+import './Register.css';
 import './App.css';
 
 function App() {
   const [isVisible, setIsVisible] = useState(true);
   const [showLogin, setShowLogin] = useState(false);
+  const [showRegister, setShowRegister] = useState(false);
   const [usuario, setUsuario] = useState('');
   const [contraseña, setContraseña] = useState('');
   const [mensaje, setMensaje] = useState('');
@@ -13,7 +16,7 @@ function App() {
     const timer = setTimeout(() => {
       setIsVisible(false);
       document.documentElement.classList.add('bg-transition'); 
-      document.body.style.backgroundColor = '#ffffff';
+      document.body.style.backgroundColor = 'var(--softer-gray)';
       setTimeout(() => {
         setShowLogin(true);
       }, 2500);
@@ -35,7 +38,7 @@ function App() {
       if (data.success) {
         setMensaje('✅ Inicio de sesión exitoso');
         setTimeout(() => {
-          window.location.href = "https://example.com"; // Redirige tras 1.5 segundos
+          window.location.href = "https://example.com";
         }, 1500);
       } else {
         setMensaje('❌ Usuario o contraseña incorrectos');
@@ -56,35 +59,35 @@ function App() {
         />
       )}
 
-      {showLogin && (
+      {showLogin && !showRegister && (
         <div className="login-container">
           <p className='title'>Hola!</p>
           <p className='subtitle'>Iniciar Sesión</p>
           <form onSubmit={handleLogin}>
-        <p className='label'>
-          Usuario
-        </p>
-        <input
-          type="text"
-          value={usuario}
-          onChange={(e) => setUsuario(e.target.value)}
-          required
-        />
-        <p className='label' style={{ marginTop: '10px' }}>
-          Contraseña
-        </p>
-        <input
-          type="password"
-          value={contraseña}
-          onChange={(e) => setContraseña(e.target.value)}
-          required
-        />
-        <button type="submit" className='ingresarButton'>Iniciar Sesión</button>
-        <button type="submit" className='registerButton'>Registrarse</button>
-      </form>
-      {mensaje && <p>{mensaje}</p>}
+            <p className='label'>Usuario</p>
+            <input
+              type="text"
+              value={usuario}
+              onChange={(e) => setUsuario(e.target.value)}
+              required
+            />
+            <p className='label' style={{ marginTop: '10px' }}>Contraseña</p>
+            <input
+              type="password"
+              value={contraseña}
+              onChange={(e) => setContraseña(e.target.value)}
+              required
+            />
+            <button type="submit" className='ingresarButton'>Iniciar Sesión</button>
+            <button type="button" className='registerButton' onClick={() => setShowRegister(true)}>
+              Registrarse
+            </button>
+          </form>
+          {mensaje && <p>{mensaje}</p>}
         </div>
       )}
+
+      {showRegister && <Register />}
     </div>
   );
 }

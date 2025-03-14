@@ -1,8 +1,12 @@
 :root {
   --yellow: #FFDA08;
+  --softer-gray: #2A2A2A;
+  --gray: #1A1A1A;
+  --input-gray: #393939;
   --black: #000;
   --white: #f2f2f2;
-
+  --CA: #CACACA;
+  
   color: #000;
 }
 
@@ -84,7 +88,6 @@ body, html {
   align-items: center;
   justify-content: center;
   padding: 20px;
-  backdrop-filter: blur(10px);
   transition: opacity 1s ease-in-out;
   opacity: 0;
   animation: fadeIn 1s forwards;
@@ -107,11 +110,10 @@ body, html {
   margin: 8px 0;
   border: none;
   color: var(--black);
-  background-color: var(--white);
+  background-color: var(--input-gray);
   border-radius: 10px;
   font-size: 16px;
   outline: none;
-  box-shadow: 0px 3px 5px #979797;
 }
 
 .login-container button:hover {
@@ -147,7 +149,7 @@ body, html {
   width: 100%;
   height: 50px;
   padding: 10px;
-  background-color: var(--black);
+  background-color: var(--gray);
   color: var(--yellow);
   border: none;
   border-radius: 10px;
@@ -158,7 +160,7 @@ body, html {
 }
 
 .title{
-  color: var(--black);
+  color: var(--CA);
   width: 100%;
   text-align: start;
   font-size: 50px;
@@ -179,7 +181,7 @@ body, html {
 }
 
 .label{
-  color: var(--black);
+  color: var(--CA);
   width: 100%;
   text-align: start;
   font-size: 20px;
