@@ -4,7 +4,7 @@ import './Register.css'; // Importa los estilos
 function Register() {
   const [usuario, setUsuario] = useState('');
   const [email, setEmail] = useState('');
-  const [contraseña, setContraseña] = useState('');
+  const [password, setPassword] = useState('');
   const [mensaje, setMensaje] = useState('');
 
   const handleRegister = async (e) => {
@@ -14,14 +14,14 @@ function Register() {
       const response = await fetch('http://localhost:5000/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ usuario, email, contraseña }),
+        body: JSON.stringify({ usuario, email, password }), // Corrección aquí
       });
 
       const data = await response.json();
       if (data.success) {
         setMensaje('✅ Registro exitoso');
       } else {
-        setMensaje('❌ Error en el registro');
+        setMensaje('❌ ' + data.message);
       }
     } catch (error) {
       setMensaje('❌ Error de conexión con el servidor');
@@ -49,8 +49,8 @@ function Register() {
         <input
           type="password"
           placeholder="Contraseña"
-          value={contraseña}
-          onChange={(e) => setContraseña(e.target.value)}
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
           required
         />
         <button type="submit" className="registerButton">Registrarse</button>
