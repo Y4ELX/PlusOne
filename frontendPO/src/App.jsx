@@ -34,7 +34,9 @@ function App() {
       const data = await response.json();
       if (data.success) {
         setMensaje('✅ Inicio de sesión exitoso');
-        
+        setTimeout(() => {
+          window.location.href = "https://example.com"; // Redirige tras 1.5 segundos
+        }, 1500);
       } else {
         setMensaje('❌ Usuario o contraseña incorrectos');
       }

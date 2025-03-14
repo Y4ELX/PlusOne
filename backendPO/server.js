@@ -11,7 +11,7 @@ app.post('/login', async (req, res) => {
   const { usuario, contraseña } = req.body;
   try {
     const resultado = await ejecutarConsulta(
-      'SELECT * FROM Usuarios_T WHERE usuario = @param1 AND contraseña = @param2',
+      'SELECT * FROM Usuarios_T WHERE usuario = @param1 AND contrasena = @param2',
       [usuario, contraseña]
     );
 
