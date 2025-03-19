@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import oneplusImg from './assets/img/oneplus.png';
 import Register from './Register.jsx';
+import Notification from './components/notification/Notification.jsx';
 import './Register.css';
 import './App.css';
 
@@ -11,6 +12,12 @@ function App() {
   const [usuario, setUsuario] = useState('');
   const [contraseña, setContraseña] = useState('');
   const [mensaje, setMensaje] = useState('');
+  const [notification, setNotification] = useState(null);
+
+  const showNotification = (message, type) => {
+    setNotification({ message, type });
+    setTimeout(() => setNotification(null), 3000); // Ocultar después de 3s
+  };
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -36,28 +43,31 @@ function App() {
 
       const data = await response.json();
       if (data.success) {
-        setMensaje('✅ Inicio de sesión exitoso');
+        showNotification("✅ Inicio de sesión exitoso", "success");
         setTimeout(() => {
           window.location.href = "https://example.com";
         }, 1500);
       } else {
-        setMensaje('❌ Usuario o contraseña incorrectos');
+        showNotification("❌ " + data.message, "error");
       }
     } catch (error) {
-      setMensaje('❌ Error en la conexión con el servidor');
+      showNotification("❌ Error de conexión con el servidor", "error");
     }
   };
 
   return (
     <div className="app-container">
+      {/* Notificación */}
+      {notification && <Notification {...notification} onClose={() => setNotification(null)} />}
+
       {isVisible && (
         <img
           src={oneplusImg}
           alt="OnePlus"
-          style={{ width: '200px', height: '200px' }}
-          className={`oneplus-image ${isVisible ? 'visible' : 'fade-out'}`}
+          style={{ width: "200px", height: "200px" }}
+          className={`oneplus-image ${isVisible ? "visible" : "fade-out"}`}
         />
-      )}
+       )}
 
       {showLogin && !showRegister && (
         <div className="login-container">
