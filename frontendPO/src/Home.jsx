@@ -9,9 +9,6 @@ function Home() {
   const [grupos, setGrupos] = useState([
     { id: 1, nombre: 'Familia', miembros: 8, color: '#FF9AA2' },
     { id: 2, nombre: 'Amigos del trabajo', miembros: 5, color: '#FFB7B2' },
-    { id: 3, nombre: 'Equipo de fútbol', miembros: 11, color: '#FFDAC1' },
-    { id: 4, nombre: 'Universidad', miembros: 15, color: '#E2F0CB' },
-    { id: 5, nombre: 'Vecinos', miembros: 7, color: '#B5EAD7' },
   ]);
 
   const showNotification = (message, type) => {
@@ -59,7 +56,7 @@ function Home() {
           className="nav-button central" 
           onClick={handleCrearGrupo}
         >
-          <i className="fas fa-plus"></i> {/* Icono de + */}
+          <i className="fas fa-plus">+</i>
         </button>
         
         <button className="nav-button">
