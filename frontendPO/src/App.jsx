@@ -1,11 +1,13 @@
-import { useState, useEffect } from 'react';
-import oneplusImg from './assets/img/oneplus.png';
-import Register from './Register.jsx';
-import Notification from './components/notification/Notification.jsx';
-import './Register.css';
-import './App.css';
+import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
+import oneplusImg from './assets/img/oneplus.png'
+import Register from './Register.jsx'
+import Notification from './components/notification/Notification.jsx'
+import './Register.css'
+import './App.css'
 
 function App() {
+  const navigate = useNavigate()
   const [isVisible, setIsVisible] = useState(true);
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
@@ -16,7 +18,7 @@ function App() {
 
   const showNotification = (message, type) => {
     setNotification({ message, type });
-    setTimeout(() => setNotification(null), 3000); // Ocultar después de 3s
+    setTimeout(() => setNotification(null), 3000);
   };
 
   useEffect(() => {
@@ -45,8 +47,8 @@ function App() {
       if (data.success) {
         showNotification("✅ Inicio de sesión exitoso", "success");
         setTimeout(() => {
-          window.location.href = "https://example.com";
-        }, 1500);
+          navigate('/home');
+        }, 2000);
       } else {
         showNotification("❌ " + data.message, "error");
       }

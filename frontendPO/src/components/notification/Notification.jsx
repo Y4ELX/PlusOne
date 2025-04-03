@@ -3,7 +3,7 @@ import "./Notification.css";
 
 function Notification({ message, type, onClose }) {
   useEffect(() => {
-    const timer = setTimeout(onClose, 7000);
+    const timer = setTimeout(onClose, 2000);
     return () => clearTimeout(timer);
   }, [onClose]);
 

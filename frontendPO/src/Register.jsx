@@ -31,7 +31,7 @@ function Register() {
         showNotification("✅ Registro exitoso", "success");
         setTimeout(() => {
           setShowLogin(true);
-        }, 200);
+        }, 3000);
       } else {
         showNotification("❌ " + data.message, "error");
       }
