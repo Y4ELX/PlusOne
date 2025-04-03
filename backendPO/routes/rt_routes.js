@@ -54,4 +54,22 @@ router.post("/register", async (req, res) => {
     }
 });
 
+// Endpoint para obtener grupos del usuario
+app.get('/api/usuario/grupos', async (req, res) => {
+    try {
+        const usuarioId = req.user.id; // Asumiendo que tienes autenticación
+        
+        const grupos = await pool.query(`
+            SELECT g.id, g.nombre, g.descripcion, ug.fecha_union, ug.es_administrador
+            FROM Grupos_T g
+            JOIN Usuario_Grupo_T ug ON g.id = ug.grupo_id
+            WHERE ug.usuario_id = @usuarioId
+        `, { usuarioId });
+        
+        res.json(grupos.recordset);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 module.exports = router;
