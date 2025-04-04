@@ -197,9 +197,11 @@ body, html {
 }
 
 .grupos-container {
+  color: var(--white);
   display: flex;
+  width: calc(100% - 80px);
   flex-direction: column;
-  align-items: start;
+  align-items: center;
   justify-content: start;
   gap: 15px;
   padding: 20px;
@@ -210,7 +212,7 @@ body, html {
   padding: 15px;
   border-radius: 10px;
   height: 150px;
-  width: calc(100% - 40px);
+  width: calc(100% - 80px);
   color: #333;
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
   transition: transform 0.2s;
@@ -232,7 +234,7 @@ body, html {
 
 /* Navbar inferior */
 .navbar {
-  position: fixed;
+  position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
@@ -285,7 +287,7 @@ body, html {
 .modal-container {
   background-color: var(--gray);
   border-radius: 8px;
-  width: 90%;
+  width: calc(100% - 80px);
   height: fit-content;
   max-width: 500px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
@@ -403,4 +405,13 @@ body, html {
 .btn-secondary:disabled {
   opacity: 0.7;
   cursor: not-allowed;
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  width: 100%;
 }

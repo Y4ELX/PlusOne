@@ -172,8 +172,7 @@ function Home() {
 
       {/* Encabezado */}
       <div className="home-header">
-        <h1 className="title">Tus Grupos</h1>
-        <p className="subtitle">Grupos a los que perteneces</p>
+        <h1 className="title">Eventos</h1>
       </div>
 
       {/* Lista de grupos */}
