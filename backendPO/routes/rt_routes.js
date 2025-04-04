@@ -55,7 +55,7 @@ router.post("/register", async (req, res) => {
 });
 
 // Endpoint para obtener grupos del usuario
-app.get('/api/usuario/grupos', async (req, res) => {
+router.get('/api/usuario/grupos', async (req, res) => {
     try {
         const usuarioId = req.user.id; // Asumiendo que tienes autenticación
         
@@ -69,6 +69,31 @@ app.get('/api/usuario/grupos', async (req, res) => {
         res.json(grupos.recordset);
     } catch (error) {
         res.status(500).json({ error: error.message });
+    }
+});
+
+// 📝 Ruta para crear un grupo
+router.post('/api/grupos', async (req, res) => {
+    const { nombre, descripcion, creado_por } = req.body;
+
+    console.log('Datos recibidos:', req.body); // Depuración: Verifica los datos recibidos
+
+    if (!nombre || !descripcion || !creado_por) {
+        return res.status(400).json({ success: false, message: "Todos los campos son obligatorios" });
+    }
+
+    try {
+        const sql = `
+            INSERT INTO Grupos_T (nombre, descripcion, fecha_creacion, creado_por)
+            VALUES (@param1, @param2, GETDATE(), @param3)
+        `;
+
+        await ejecutarConsulta(sql, [nombre, descripcion, creado_por]);
+
+        res.status(201).json({ success: true, message: "Grupo creado con éxito" });
+    } catch (error) {
+        console.error("❌ Error al crear el grupo:", error);
+        res.status(500).json({ success: false, message: "Error en el servidor" });
     }
 });
 

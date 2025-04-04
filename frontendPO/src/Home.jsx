@@ -6,6 +6,8 @@ function Home() {
   const [notification, setNotification] = useState(null);
   const [grupos, setGrupos] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false); // Estado para mostrar/ocultar el modal
+  const [nuevoGrupo, setNuevoGrupo] = useState({ nombre: '', descripcion: '' }); // Datos del nuevo grupo
 
   // Cargar grupos del usuario al montar el componente
   useEffect(() => {
@@ -44,11 +46,49 @@ function Home() {
   };
 
   const handleCrearGrupo = () => {
-    showNotification("🔄 Redirigiendo a creación de grupo...", "info");
-    // Aquí iría la navegación a la pantalla de creación
-    setTimeout(() => {
-      // navigate('/crear-grupo'); // Si estás usando react-router
-    }, 1500);
+    setShowModal(true); // Mostrar el modal
+  };
+
+  const handleCerrarModal = () => {
+    setShowModal(false); // Ocultar el modal
+    setNuevoGrupo({ nombre: '', descripcion: '' }); // Limpiar los datos del formulario
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setNuevoGrupo({ ...nuevoGrupo, [name]: value });
+  };
+
+  const handleSubmitGrupo = async (e) => {
+    e.preventDefault();
+
+    try {
+        console.log('Datos enviados:', nuevoGrupo); // Depuración: Verifica los datos enviados
+
+        const response = await fetch('http://localhost:5000/api/grupos', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                ...nuevoGrupo,
+                creado_por: localStorage.getItem('userId'), // ID del usuario creador
+            }),
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            showNotification('✅ Grupo creado con éxito', 'success');
+            setGrupos([...grupos, { ...nuevoGrupo, id: Date.now() }]); // Agregar el nuevo grupo a la lista
+            handleCerrarModal();
+        } else {
+            showNotification(`❌ ${data.message}`, 'error');
+        }
+    } catch (error) {
+        console.error('❌ Error al crear el grupo:', error);
+        showNotification('❌ Error en el servidor', 'error');
+    }
   };
 
   const handleVerDetalles = (grupoId) => {
@@ -71,6 +111,40 @@ function Home() {
     <div className="app-container">
       {/* Notificación */}
       {notification && <Notification {...notification} onClose={() => setNotification(null)} />}
+
+      {/* Modal para crear grupo */}
+      {showModal && (
+        <div className="modal">
+          <div className="modal-content">
+            <span className="close" onClick={handleCerrarModal}>
+              &times;
+            </span>
+            <h2>Crear Grupo</h2>
+            <form onSubmit={handleSubmitGrupo}>
+              <label>
+                Nombre del Grupo:
+                <input
+                  type="text"
+                  name="nombre"
+                  value={nuevoGrupo.nombre}
+                  onChange={handleInputChange}
+                  required
+                />
+              </label>
+              <label>
+                Descripción:
+                <textarea
+                  name="descripcion"
+                  value={nuevoGrupo.descripcion}
+                  onChange={handleInputChange}
+                  required
+                />
+              </label>
+              <button type="submit">Crear</button>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Encabezado */}
       <div className="home-header">
@@ -121,7 +195,7 @@ function Home() {
           onClick={handleCrearGrupo}
         >
           <div className="plus-circle">
-            <i className="fas fa-plus"></i>
+            <i className="fas fa-plus">+</i>
           </div>
         </button>
         
