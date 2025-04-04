@@ -15,6 +15,7 @@ function App() {
   const [contraseña, setContraseña] = useState('');
   const [mensaje, setMensaje] = useState('');
   const [notification, setNotification] = useState(null);
+  const [isLoading, setIsLoading] = useState(false); // Nuevo estado para el loading
 
   const showNotification = (message, type) => {
     setNotification({ message, type });
@@ -36,6 +37,8 @@ function App() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setIsLoading(true); // Activar loading al iniciar la petición
+    
     try {
       const response = await fetch('http://localhost:5000/login', {
         method: 'POST',
@@ -46,14 +49,14 @@ function App() {
       const data = await response.json();
       if (data.success) {
         showNotification("✅ Inicio de sesión exitoso", "success");
-        setTimeout(() => {
-          navigate('/home');
-        }, 2000);
+        navigate('/home');
       } else {
         showNotification("❌ " + data.message, "error");
       }
     } catch (error) {
       showNotification("❌ Error de conexión con el servidor", "error");
+    } finally {
+      setIsLoading(false); // Desactivar loading al finalizar
     }
   };
 
@@ -90,8 +93,23 @@ function App() {
               onChange={(e) => setContraseña(e.target.value)}
               required
             />
-            <button type="submit" className='ingresarButton'>Iniciar Sesión</button>
-            <button type="button" className='registerButton' onClick={() => setShowRegister(true)}>
+            <button 
+              type="submit" 
+              className='ingresarButton' 
+              disabled={isLoading} // Deshabilitar el botón durante el loading
+            >
+              {isLoading ? (
+                <>
+                  <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                  <span className="ms-2">Cargando...</span>
+                </>
+              ) : 'Iniciar Sesión'}
+            </button>
+            <button 
+              type="button" 
+              className='registerButton' 
+              onClick={() => setShowRegister(true)}
+            >
               Registrarse
             </button>
           </form>
