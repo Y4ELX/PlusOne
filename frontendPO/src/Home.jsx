@@ -6,20 +6,23 @@ function Home() {
   const [notification, setNotification] = useState(null);
   const [grupos, setGrupos] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [showModal, setShowModal] = useState(false); // Estado para mostrar/ocultar el modal
-  const [nuevoGrupo, setNuevoGrupo] = useState({ nombre: '', descripcion: '' }); // Datos del nuevo grupo
+  const [showModal, setShowModal] = useState(false);
+  const [nuevoGrupo, setNuevoGrupo] = useState({ 
+    nombre: '', 
+    descripcion: '' 
+  });
+  const [isCreating, setIsCreating] = useState(false);
 
   // Cargar grupos del usuario al montar el componente
   useEffect(() => {
     const cargarGrupos = async () => {
       try {
-        // Simulando una llamada a la API
         const response = await fetch('http://localhost:5000/api/usuario/grupos', {
-            headers: {
-              'Authorization': `Bearer ${localStorage.getItem('token')}`, // Asegúrate de que el token esté en este formato
-              'Content-Type': 'application/json'
-            }
-          });
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            'Content-Type': 'application/json'
+          }
+        });
         
         if (!response.ok) throw new Error('Error al cargar grupos');
         
@@ -27,7 +30,7 @@ function Home() {
         setGrupos(data);
       } catch (error) {
         showNotification(`❌ ${error.message}`, "error");
-        // Datos de ejemplo si falla la API (solo para desarrollo)
+        // Datos de ejemplo si falla la API
         setGrupos([
           { id: 1, nombre: 'Familia', miembros: 8, color: '#FF9AA2', esAdmin: true },
           { id: 2, nombre: 'Amigos del trabajo', miembros: 5, color: '#FFB7B2', esAdmin: false },
@@ -46,12 +49,12 @@ function Home() {
   };
 
   const handleCrearGrupo = () => {
-    setShowModal(true); // Mostrar el modal
+    setShowModal(true);
   };
 
   const handleCerrarModal = () => {
-    setShowModal(false); // Ocultar el modal
-    setNuevoGrupo({ nombre: '', descripcion: '' }); // Limpiar los datos del formulario
+    setShowModal(false);
+    setNuevoGrupo({ nombre: '', descripcion: '' });
   };
 
   const handleInputChange = (e) => {
@@ -61,38 +64,37 @@ function Home() {
 
   const handleSubmitGrupo = async (e) => {
     e.preventDefault();
+    setIsCreating(true);
 
     try {
-        console.log('Datos enviados:', nuevoGrupo); // Depuración: Verifica los datos enviados
+      const response = await fetch('http://localhost:5000/api/grupos', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(nuevoGrupo)
+      });
 
-        const response = await fetch('http://localhost:5000/api/grupos', {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`, // Asegúrate de que el token esté en este formato
-                'Content-Type': 'application/json',
-            },
-            credentials: 'include', // Incluir cookies de sesión
-            body: JSON.stringify(nuevoGrupo),
-        });
+      const data = await response.json();
 
-        const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || 'Error al crear grupo');
+      }
 
-        if (data.success) {
-            showNotification('✅ Grupo creado con éxito', 'success');
-            setGrupos([...grupos, { ...nuevoGrupo, id: Date.now() }]); // Agregar el nuevo grupo a la lista
-            handleCerrarModal();
-        } else {
-            showNotification(`❌ ${data.message}`, 'error');
-        }
+      showNotification('✅ Grupo creado con éxito', 'success');
+      setGrupos([...grupos, { ...nuevoGrupo, id: Date.now() }]);
+      handleCerrarModal();
     } catch (error) {
-        console.error('❌ Error al crear el grupo:', error);
-        showNotification('❌ Error en el servidor', 'error');
+      console.error('Error al crear el grupo:', error);
+      showNotification(`❌ ${error.message}`, 'error');
+    } finally {
+      setIsCreating(false);
     }
   };
 
   const handleVerDetalles = (grupoId) => {
     showNotification(`🔍 Viendo detalles del grupo ${grupoId}`, "info");
-    // navigate(`/grupo/${grupoId}`); // Si estás usando react-router
   };
 
   if (isLoading) {
@@ -111,35 +113,61 @@ function Home() {
       {/* Notificación */}
       {notification && <Notification {...notification} onClose={() => setNotification(null)} />}
 
-      {/* Modal para crear grupo */}
+      {/* Modal para crear grupo - Versión mejorada */}
       {showModal && (
-        <div className="modal">
-          <div className="modal-content">
-            <span className="close" onClick={handleCerrarModal}>
-              &times;
-            </span>
-            <h2>Crear Grupo</h2>
-            <form onSubmit={handleSubmitGrupo}>
-              <label>
-                Nombre del Grupo:
+        <div className="modal-overlay">
+          <div className="modal-container">
+            <div className="modal-header">
+              <h2>Crear Nuevo Grupo</h2>
+              <button className="modal-close" onClick={handleCerrarModal}>
+                &times;
+              </button>
+            </div>
+            
+            <form onSubmit={handleSubmitGrupo} className="modal-form">
+              <div className="form-group">
+                <label htmlFor="nombre">Nombre del Grupo</label>
                 <input
                   type="text"
+                  id="nombre"
                   name="nombre"
                   value={nuevoGrupo.nombre}
                   onChange={handleInputChange}
+                  placeholder="Ej: Familia, Amigos, Equipo de trabajo"
                   required
                 />
-              </label>
-              <label>
-                Descripción:
+              </div>
+              
+              <div className="form-group">
+                <label htmlFor="descripcion">Descripción</label>
                 <textarea
+                  id="descripcion"
                   name="descripcion"
                   value={nuevoGrupo.descripcion}
                   onChange={handleInputChange}
+                  placeholder="Describe el propósito de este grupo"
+                  rows="3"
                   required
                 />
-              </label>
-              <button type="submit">Crear</button>
+              </div>
+              
+              <div className="modal-actions">
+                <button 
+                  type="button" 
+                  className="btn-secondary" 
+                  onClick={handleCerrarModal}
+                  disabled={isCreating}
+                >
+                  Cancelar
+                </button>
+                <button 
+                  type="submit" 
+                  className="btn-primary"
+                  disabled={isCreating}
+                >
+                  {isCreating ? 'Creando...' : 'Crear Grupo'}
+                </button>
+              </div>
             </form>
           </div>
         </div>
