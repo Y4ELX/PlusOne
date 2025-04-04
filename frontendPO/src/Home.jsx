@@ -17,24 +17,21 @@ function Home() {
   useEffect(() => {
     const cargarGrupos = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/usuario/grupos', {
+        const response = await fetch('http://localhost:5000/api/grupos', {
           headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
-            'Content-Type': 'application/json'
-          }
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include', // Incluir cookies de sesión
         });
         
         if (!response.ok) throw new Error('Error al cargar grupos');
         
         const data = await response.json();
-        setGrupos(data);
+        // Asegúrate de que `data.grupos` sea un array
+        setGrupos(data.grupos || []); // Si `data.grupos` no existe, usa un array vacío
       } catch (error) {
-        showNotification(`❌ ${error.message}`, "error");
-        // Datos de ejemplo si falla la API
-        setGrupos([
-          { id: 1, nombre: 'Familia', miembros: 8, color: '#FF9AA2', esAdmin: true },
-          { id: 2, nombre: 'Amigos del trabajo', miembros: 5, color: '#FFB7B2', esAdmin: false },
-        ]);
+        console.error('Error al cargar los grupos:', error);
+        showNotification(`❌ ${error.message}`, 'error');
       } finally {
         setIsLoading(false);
       }

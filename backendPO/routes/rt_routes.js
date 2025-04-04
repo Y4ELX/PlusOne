@@ -77,20 +77,24 @@ router.post("/register", async (req, res) => {
 });
 
 // Endpoint para obtener grupos del usuario
-router.get('/api/usuario/grupos', async (req, res) => {
+
+// 📝 Ruta para obtener todos los grupos
+router.get('/api/grupos', async (req, res) => {
     try {
-        const usuarioId = req.user.id; // Asumiendo que tienes autenticación
-        
-        const grupos = await pool.query(`
-            SELECT g.id, g.nombre, g.descripcion, ug.fecha_union, ug.es_administrador
-            FROM Grupos_T g
-            JOIN Usuario_Grupo_T ug ON g.id = ug.grupo_id
-            WHERE ug.usuario_id = @usuarioId
-        `, { usuarioId });
-        
-        res.json(grupos.recordset);
+        const sql = `
+            SELECT id, nombre, descripcion, fecha_creacion, creado_por
+            FROM Grupos_T
+        `;
+
+        const resultado = await ejecutarConsulta(sql);
+
+        // Asegúrate de que `resultado` sea un array
+        const grupos = resultado.recordset || resultado; // Si `recordset` existe, úsalo; de lo contrario, usa `resultado`
+
+        res.status(200).json({ success: true, grupos });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error("❌ Error al obtener los grupos:", error);
+        res.status(500).json({ success: false, message: "Error al obtener los grupos" });
     }
 });
 
