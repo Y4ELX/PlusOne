@@ -16,7 +16,7 @@ function Home() {
         // Simulando una llamada a la API
         const response = await fetch('http://localhost:5000/api/usuario/grupos', {
             headers: {
-              'Authorization': `Bearer ${localStorage.getItem('token')}`,
+              'Authorization': `Bearer ${localStorage.getItem('token')}`, // Asegúrate de que el token esté en este formato
               'Content-Type': 'application/json'
             }
           });
@@ -68,12 +68,11 @@ function Home() {
         const response = await fetch('http://localhost:5000/api/grupos', {
             method: 'POST',
             headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`, // Asegúrate de que el token esté en este formato
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-                ...nuevoGrupo,
-                creado_por: localStorage.getItem('userId'), // ID del usuario creador
-            }),
+            credentials: 'include', // Incluir cookies de sesión
+            body: JSON.stringify(nuevoGrupo),
         });
 
         const data = await response.json();

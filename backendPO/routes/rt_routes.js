@@ -20,7 +20,9 @@ router.post('/login', async (req, res) => {
             const match = await bcrypt.compare(contraseña, user.contrasena);
 
             if (match) {
-                res.json({ success: true, message: 'Inicio de sesión exitoso' });
+                // Guardar el usuario en la sesión
+                req.session.user = { id: user.id, usuario: user.usuario };
+                res.json({ success: true, message: 'Inicio de sesión exitoso', userId: user.id });
             } else {
                 res.status(401).json({ success: false, message: 'Credenciales incorrectas' });
             }
@@ -31,6 +33,18 @@ router.post('/login', async (req, res) => {
         console.error("❌ Error en el login:", error);
         res.status(500).json({ success: false, message: "Error en el servidor" });
     }
+});
+
+// 📝 Ruta para cerrar sesión
+router.post('/logout', (req, res) => {
+    req.session.destroy((err) => {
+        if (err) {
+            console.error("❌ Error al cerrar sesión:", err);
+            return res.status(500).json({ success: false, message: "Error al cerrar sesión" });
+        }
+        res.clearCookie('connect.sid'); // Elimina la cookie de sesión
+        res.json({ success: true, message: "Sesión cerrada con éxito" });
+    });
 });
 
 // 📝 Ruta para registrar usuario con contraseña hasheada
@@ -74,9 +88,11 @@ router.get('/api/usuario/grupos', async (req, res) => {
 
 // 📝 Ruta para crear un grupo
 router.post('/api/grupos', async (req, res) => {
-    const { nombre, descripcion, creado_por } = req.body;
+    const { nombre, descripcion } = req.body;
 
     console.log('Datos recibidos:', req.body); // Depuración: Verifica los datos recibidos
+
+    const creado_por = req.session.user.id; // Extraer el ID del usuario desde la sesión
 
     if (!nombre || !descripcion || !creado_por) {
         return res.status(400).json({ success: false, message: "Todos los campos son obligatorios" });
