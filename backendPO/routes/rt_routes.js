@@ -55,7 +55,7 @@ router.post("/register", async (req, res) => {
 });
 
 // Endpoint para obtener grupos del usuario
-app.get('/api/usuario/grupos', async (req, res) => {
+router.get('/api/usuario/grupos', async (req, res) => {
     try {
         const usuarioId = req.user.id; // Asumiendo que tienes autenticación
         

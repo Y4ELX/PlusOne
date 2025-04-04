@@ -121,7 +121,7 @@ function Home() {
           onClick={handleCrearGrupo}
         >
           <div className="plus-circle">
-            <i className="fas fa-plus"></i>
+            <i className="fas fa-plus">+</i>
           </div>
         </button>
         
