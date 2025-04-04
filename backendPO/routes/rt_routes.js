@@ -99,6 +99,7 @@ router.post('/api/grupos', async (req, res) => {
     console.log('Sesión en /api/grupos:', req.session); // Depuración
 
     const { nombre, descripcion } = req.body;
+    
     const creado_por = 32||req.session.user?.id; // Extraer el ID del usuario desde la sesión
 
     if (!nombre || !descripcion || !creado_por) {
