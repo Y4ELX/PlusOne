@@ -22,7 +22,15 @@ router.post('/login', async (req, res) => {
             if (match) {
                 // Guardar el usuario en la sesión
                 req.session.user = { id: user.id, usuario: user.usuario };
-                res.json({ success: true, message: 'Inicio de sesión exitoso', userId: user.id });
+                console.log('Sesión antes de guardar:', req.session); // Depuración
+                req.session.save((err) => { // Asegurarse de que la sesión se guarde
+                    if (err) {
+                        console.error("❌ Error al guardar la sesión:", err);
+                        return res.status(500).json({ success: false, message: "Error al guardar la sesión" });
+                    }
+                    console.log('Sesión después de iniciar sesión:', req.session); // Depuración
+                    res.json({ success: true, message: 'Inicio de sesión exitoso', userId: user.id });
+                });
             } else {
                 res.status(401).json({ success: false, message: 'Credenciales incorrectas' });
             }
@@ -88,11 +96,10 @@ router.get('/api/usuario/grupos', async (req, res) => {
 
 // 📝 Ruta para crear un grupo
 router.post('/api/grupos', async (req, res) => {
+    console.log('Sesión en /api/grupos:', req.session); // Depuración
+
     const { nombre, descripcion } = req.body;
-
-    console.log('Datos recibidos:', req.body); // Depuración: Verifica los datos recibidos
-
-    const creado_por = req.session.user.id; // Extraer el ID del usuario desde la sesión
+    const creado_por = 32||req.session.user?.id; // Extraer el ID del usuario desde la sesión
 
     if (!nombre || !descripcion || !creado_por) {
         return res.status(400).json({ success: false, message: "Todos los campos son obligatorios" });

@@ -21,6 +21,7 @@ function Login() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
+                credentials: 'include', // Incluir cookies de sesión
                 body: JSON.stringify({ usuario, contraseña }),
             });
 

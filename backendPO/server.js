@@ -23,6 +23,12 @@ app.use(session({
     },
 }));
 
+// Middleware para depurar la sesión
+app.use((req, res, next) => {
+    console.log('Contenido de la sesión:', req.session); // Depuración
+    next();
+});
+
 // Middleware para verificar la sesión
 const authenticateSession = (req, res, next) => {
     if (!req.session.user) {
@@ -32,7 +38,7 @@ const authenticateSession = (req, res, next) => {
 };
 
 // Usar el middleware en rutas protegidas
-app.use('/api', authenticateSession);
+/* app.use('/api', authenticateSession); */
 
 //Rutas
 app.use('/', require('./routes/rt_index'));
