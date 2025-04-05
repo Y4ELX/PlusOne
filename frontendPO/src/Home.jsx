@@ -8,6 +8,7 @@ function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [nuevoGrupo, setNuevoGrupo] = useState({ 
+    userId: localStorage.getItem('userId'), // Obtén el userId desde localStorage
     nombre: '', 
     descripcion: '' 
   });
@@ -17,6 +18,7 @@ function Home() {
   useEffect(() => {
     const cargarGrupos = async () => {
       try {
+
         const response = await fetch('http://localhost:5000/api/grupos', {
           headers: {
             'Content-Type': 'application/json',
@@ -35,6 +37,9 @@ function Home() {
       } finally {
         setIsLoading(false);
       }
+
+      
+
     };
     
     cargarGrupos();
@@ -64,13 +69,15 @@ function Home() {
     setIsCreating(true);
 
     try {
+      const userId = localStorage.getItem('userId'); // Obtén el userId desde localStorage
       const response = await fetch('http://localhost:5000/api/grupos', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(nuevoGrupo)
+        credentials: 'include', // OTRO BASTARDO HOMOSEXUAL
+        body: JSON.stringify(nuevoGrupo, userId)
       });
 
       const data = await response.json();

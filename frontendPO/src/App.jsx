@@ -44,12 +44,14 @@ function App() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ usuario, contraseña }),
+        credentials: 'include', //<--ESTE PUTOTE ERA EL QUE EVITABA QUE JALARA EL ID
       });
 
       const data = await response.json();
       if (data.success) {
         showNotification("✅ Inicio de sesión exitoso", "success");
         navigate('/home');
+        
       } else {
         showNotification("❌ " + data.message, "error");
       }

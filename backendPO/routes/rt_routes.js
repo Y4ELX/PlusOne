@@ -2,9 +2,10 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require("bcrypt");
 const { ejecutarConsulta } = require('../db');
-
+const { authenticateSession } = require('../middlewares/mdw_auth'); // Asegúrate de que la ruta sea correcta
+const { guardarUsuarioEnLocals } = require('../middlewares/mdw_general'); // Asegúrate de que la ruta sea correcta
 // 📝 Ruta para iniciar sesión
-router.post('/login', async (req, res) => {
+router.post('/login',guardarUsuarioEnLocals, async (req, res) => {
     const { usuario, contraseña } = req.body;
 
     try {
@@ -18,19 +19,28 @@ router.post('/login', async (req, res) => {
 
             // Compara la contraseña ingresada con la hasheada en la BD
             const match = await bcrypt.compare(contraseña, user.contrasena);
+            req.session.user = { 
+                id: user.id,
+                usuario: user.usuario 
+                };
+
 
             if (match) {
                 // Guardar el usuario en la sesión
-                req.session.user = { id: user.id, usuario: user.usuario };
+            
+                console.log('Usuario guardado en la sesión:', req.session.user); // Depuración
                 console.log('Sesión antes de guardar:', req.session); // Depuración
-                req.session.save((err) => { // Asegurarse de que la sesión se guarde
+            /*    req.session.save((err) => {
                     if (err) {
                         console.error("❌ Error al guardar la sesión:", err);
                         return res.status(500).json({ success: false, message: "Error al guardar la sesión" });
-                    }
-                    console.log('Sesión después de iniciar sesión:', req.session); // Depuración
+                    }*/
+                    console.log('✅ Sesión guardada correctamente:', req.session);
                     res.json({ success: true, message: 'Inicio de sesión exitoso', userId: user.id });
-                });
+                    console.log(res.json)
+              /*  });*/
+
+                
             } else {
                 res.status(401).json({ success: false, message: 'Credenciales incorrectas' });
             }
@@ -41,6 +51,11 @@ router.post('/login', async (req, res) => {
         console.error("❌ Error en el login:", error);
         res.status(500).json({ success: false, message: "Error en el servidor" });
     }
+});
+
+router.use((req, res, next) => {
+    console.log(req.session.user); // Depuración
+    next();
 });
 
 // 📝 Ruta para cerrar sesión
@@ -79,11 +94,11 @@ router.post("/register", async (req, res) => {
 // Endpoint para obtener grupos del usuario
 
 // 📝 Ruta para obtener todos los grupos
-router.get('/api/grupos', async (req, res) => {
+router.get('/api/grupos', authenticateSession ,async (req, res) => {
     try {
         const sql = `
             SELECT id, nombre, descripcion, fecha_creacion, creado_por
-            FROM Grupos_T
+            FROM Grupos_T WHERE 
         `;
 
         const resultado = await ejecutarConsulta(sql);
@@ -99,12 +114,20 @@ router.get('/api/grupos', async (req, res) => {
 });
 
 // 📝 Ruta para crear un grupo
-router.post('/api/grupos', async (req, res) => {
-    console.log('Sesión en /api/grupos:', req.session); // Depuración
+router.post('/api/grupos',  async (req, res) => {
+    console.log('Contenido de res.locals en /api/grupos:', req.session.user); // Depuración
+    const {id} = req.session.user
 
-    const { nombre, descripcion } = req.body;
-    
-    const creado_por = 32||req.session.user?.id; // Extraer el ID del usuario desde la sesión
+  /*  if (!res.locals.user) {
+        return res.status(401).json({ success: false, message: "Usuario no autenticado" });
+    }
+*/
+
+    console.log('ID del usuario desde res.locals:',res.locals.users); // Depuración
+
+    const { userId, nombre, descripcion } = req.body;
+    console.log(req.body); // Depuración
+    const creado_por = id // Extraer el ID del usuario desde la sesión
 
     if (!nombre || !descripcion || !creado_por) {
         return res.status(400).json({ success: false, message: "Todos los campos son obligatorios" });

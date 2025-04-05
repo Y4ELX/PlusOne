@@ -28,6 +28,8 @@ function Login() {
             const data = await response.json();
 
             if (data.success) {
+
+                console.log('Token recibido:', data.token);
                 // Guardar el token y el ID del usuario en localStorage
                 localStorage.setItem('token', data.token);
                 localStorage.setItem('userId', data.userId);

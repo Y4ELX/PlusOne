@@ -2,12 +2,13 @@ require('dotenv').config(); // Asegúrate de que esto esté al inicio
 const express = require('express');
 const cors = require('cors');
 const session = require('express-session');
+const { guardarUsuarioEnLocals } = require('./middlewares/mdw_general');
 
 //Middleware
 const app = express();
 app.use(express.json());
 app.use(cors({
-    origin: 'http://localhost:5174', // Cambia esto al dominio de tu frontend
+    origin: 'http://localhost:5173', // Cambia esto al dominio de tu frontend
     credentials: true, // Permitir cookies de sesión
 }));
 
@@ -19,23 +20,19 @@ app.use(session({
     cookie: {
         httpOnly: true,
         secure: false, // Cambia a true si usas HTTPS
-        maxAge: 1000 * 60 * 60, // 1 hora
+        sameSite: 'lax', // Permitir cookies en solicitudes entre sitios
+
     },
 }));
 
 // Middleware para depurar la sesión
 app.use((req, res, next) => {
-    console.log('Contenido de la sesión:', req.session); // Depuración
+    console.log('Contenido de la sesión:', req.session.user); // Depuración
     next();
 });
 
 // Middleware para verificar la sesión
-const authenticateSession = (req, res, next) => {
-    if (!req.session.user) {
-        return res.status(401).json({ success: false, message: 'No has iniciado sesión' });
-    }
-    next();
-};
+
 
 // Usar el middleware en rutas protegidas
 /* app.use('/api', authenticateSession); */
