@@ -95,10 +95,13 @@ router.post("/register", async (req, res) => {
 
 // 📝 Ruta para obtener todos los grupos
 router.get('/api/grupos', authenticateSession ,async (req, res) => {
+    const {id} = req.session.user
     try {
         const sql = `
-            SELECT id, nombre, descripcion, fecha_creacion, creado_por
-            FROM Grupos_T WHERE 
+            SELECT G.id, G.nombre, G.descripcion, G.fecha_creacion, G.creado_por
+            FROM Grupos_T G 
+           INNER JOIN Usuario_Grupo_T UG ON G.id = UG.grupo_id
+            WHERE UG.usuario_id = ${id}
         `;
 
         const resultado = await ejecutarConsulta(sql);
@@ -136,11 +139,23 @@ router.post('/api/grupos',  async (req, res) => {
     try {
         const sql = `
             INSERT INTO Grupos_T (nombre, descripcion, fecha_creacion, creado_por)
+            OUTPUT INSERTED.id -- Devuelve el ID del grupo recién creado
             VALUES (@param1, @param2, GETDATE(), @param3)
         `;
 
-        await ejecutarConsulta(sql, [nombre, descripcion, creado_por]);
+     const resultado = await ejecutarConsulta(sql, [nombre, descripcion, creado_por]);
+     console.log('Resultado de la consulta INSERT:', resultado); // Depuración
+     const grupoId = resultado[0].id; // Obtén el ID del grupo recién creado
+     console.log('ID del grupo recién creado:', grupoId); // Depuración
 
+     const sqlInsertUsuarioGrupo = `
+            INSERT INTO Usuario_Grupo_T (usuario_id, grupo_id, fecha_union, es_administrador)
+            VALUES (@param1, @param2, GETDATE(), @param3)
+        `;
+        await ejecutarConsulta(sqlInsertUsuarioGrupo, [id, grupoId, 1]); // `1` indica que el usuario es administrador
+
+        const enlace = `http://localhost:5173/join/${grupoId}`;
+        console.log('Enlace para unirse al grupo:', enlace); // Depuración
         res.status(201).json({ success: true, message: "Grupo creado con éxito" });
     } catch (error) {
         console.error("❌ Error al crear el grupo:", error);

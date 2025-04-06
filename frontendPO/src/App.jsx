@@ -50,7 +50,8 @@ function App() {
       const data = await response.json();
       if (data.success) {
         showNotification("✅ Inicio de sesión exitoso", "success");
-        navigate('/home');
+        const redirectTo = location.state?.from || '/home'; // Redirige al grupo o a /home
+        navigate(redirectTo);
         
       } else {
         showNotification("❌ " + data.message, "error");

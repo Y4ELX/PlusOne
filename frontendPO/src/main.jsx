@@ -4,6 +4,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import './index.css'
 import App from './App'
 import Home from './Home'
+import JoinGroup from './components/JoinGroup';
 
 const router = createBrowserRouter([
   {
@@ -14,6 +15,7 @@ const router = createBrowserRouter([
     path: '/home',
     element: <Home />,
   },
+  { path: '/join/:token', element: <JoinGroup /> },
 ])
 
 createRoot(document.getElementById('root')).render(
