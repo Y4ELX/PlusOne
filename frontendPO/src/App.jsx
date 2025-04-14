@@ -48,6 +48,9 @@ function App() {
       });
 
       const data = await response.json();
+
+      console.log("Respuesta del servidor:", data);
+
       if (data.success) {
         showNotification("✅ Inicio de sesión exitoso", "success");
         navigate('/home');
